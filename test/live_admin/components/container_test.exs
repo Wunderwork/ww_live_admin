@@ -138,6 +138,20 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
+  describe "list resource with invalid prefix in session" do
+    setup %{conn: conn} do
+      stub(LiveAdminTest.MockSession, :load!, fn _customer_id ->
+        %LiveAdmin.Session{prefix: "invalid"}
+      end)
+
+      %{page: live(conn, "/user")}
+    end
+
+    test "redirects to clear prefix", %{page: page} do
+      assert {:error, {:live_redirect, %{to: "/user?prefix="}}} = page
+    end
+  end
+
   describe "new parent resource" do
     setup %{conn: conn} do
       {:ok, view, html} = live(conn, "/user/new")
@@ -244,6 +258,22 @@ defmodule LiveAdmin.Components.ContainerTest do
       assert response
              |> Floki.find("input[name='params[previous_versions]']")
              |> Enum.any?()
+    end
+  end
+
+  describe "edit resource with invalid prefix in session" do
+    setup %{conn: conn} do
+      stub(LiveAdminTest.MockSession, :load!, fn _customer_id ->
+        %LiveAdmin.Session{prefix: "invalid"}
+      end)
+
+      user = Repo.insert!(%User{settings: %{}})
+
+      %{page: live(conn, "/user/edit/#{user.id}")}
+    end
+
+    test "redirects to clear prefix", %{page: page} do
+      assert {:error, {:live_redirect, %{to: "/user?prefix="}}} = page
     end
   end
 
