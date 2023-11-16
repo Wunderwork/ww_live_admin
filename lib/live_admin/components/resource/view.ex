@@ -32,14 +32,17 @@ defmodule LiveAdmin.Components.Container.View do
             <dt class="field__label"><%= trans(humanize(field)) %></dt>
             <dd class={"field__#{field_class(type)}"}>
               <%= if assoc_resource && Map.fetch!(@record, field) do %>
-                <%= live_redirect(label,
-                  to:
+                <.link
+                  patch={
                     route_with_params(assigns,
                       resource_path: elem(assoc_resource, 0),
                       segments: [Map.fetch!(@record, field)]
-                    ),
-                  class: "resource__action--btn"
-                ) %>
+                    )
+                  }
+                  class="resource__action--btn"
+                >
+                  <%= label %>
+                </.link>
               <% else %>
                 <%= label %>
               <% end %>
